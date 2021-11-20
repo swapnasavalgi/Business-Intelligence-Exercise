@@ -1,0 +1,203 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+#install.packages('corrplot')
+library(corrplot)
+#install.packages("lattice")
+library("lattice")
+#install.packages("ggpubr")
+library(ggpubr)
+
+```
+
+
+```{r}
+dat2015 = read_csv('2015.csv')
+print(getwd())
+dat2016 = read_csv('2016.csv')
+print(getwd())
+dat2017 = read_csv('2017.csv')
+print(getwd())
+```
+
+
+
+```{r}
+dat2015= dat2015%>%
+  select(-Region)
+
+```
+
+```{r}
+dat2016= dat2016%>%
+  select(-Region)
+```
+
+
+```{r}
+dat2015 = dat2015%>%drop_na()
+dat2016 = dat2016%>%drop_na()
+dat2017 = dat2017%>%drop_na()
+
+```
+
+```{r}
+colnames(dat2015)
+```
+
+
+```{r}
+#library(dplyr)
+data2015 <- dat2015%>% janitor::clean_names()
+data2016 <- dat2016%>% janitor::clean_names()
+data2017 <- dat2017%>% janitor::clean_names()
+```
+
+
+```{r}
+data2015$Year <- "2015" 
+data2016$Year <- "2016" 
+data2017$Year <- "2017" 
+```
+
+```{r}
+ggplot(data2017, aes(x=happiness_score, y=economy_gdp_per_capita, color = 'RoyalBlue'))+
+  geom_point(color = 'blue')+
+geom_smooth(method = 'lm', se = FALSE)+ theme(legend.position="none",panel.background = element_blank()) + labs(title = "Happiness Score-Economic Rate Postive Correlation")+
+stat_cor(method= 'pearson',label.x = 1 )
+
+ggsave("Econmic.png")
+```
+
+```{r}
+colnames(data2015)
+```
+
+
+
+```{r}
+ggplot(data2017, aes(x=happiness_score, y=family))+
+  geom_point(color = 'red')+
+geom_smooth(method = 'lm', se = FALSE)+ theme(legend.position="none",panel.background = element_blank()) + labs(title = "Happiness Score & Family Postive Correlation") + stat_cor(method= 'pearson' )
+
+ggsave("Family.png")
+```
+
+```{r}
+head(data2017)
+```
+
+
+```{r}
+ggplot(data2017, aes(x=happiness_score, y= health_life_expectancy))+
+  geom_point(color = 'purple')+
+geom_smooth(method = 'lm', color = 'red',se = FALSE)+ theme(legend.position="none",panel.background = element_blank()) + labs(title = "Happiness Score & Life Expectancy Postive Correlation") + stat_cor(method= 'pearson' )
+
+ggsave("Life Ex.png")
+
+```
+
+
+
+```{r}
+top2015 <- head(data2015)
+top5_2015 <- top2015%>%
+  select(country,happiness_rank,Year)
+top5_2015
+```
+
+
+```{r}
+top2016 <- head(data2016)
+top5_2016 <- top2016%>%
+  select(country,happiness_rank,Year)
+
+```
+
+```{r}
+top2017 <- head(data2017)
+top5_2017 <- top2017%>%
+  select(country,happiness_rank,Year)
+
+```
+
+
+```{r}
+new <- rbind(top5_2015,top5_2016)
+df <- rbind(new,top5_2017)
+df
+```
+
+```{r}
+p = ggplot(df, aes(x = Year, y = happiness_rank)) +
+  geom_col() +
+  facet_wrap(~country) +
+  labs(title = "Top 5 Countries -2015, 2016 and 2017",
+subtitle = "Faceted by countries")+
+  theme(strip.text = element_text(face="bold", size=9),panel.background = element_blank(),
+  strip.background = element_rect(fill="lightblue", colour="blue",size=1))
+p +
+  theme(strip.text.x = element_text(margin = margin(.1, 0, .1, 0, "cm")))
+
+ggsave("Top5Countries.png")
+```
+
+
+```{r}
+head(data2015)
+```
+
+```{r}
+library(ggcorrplot)
+```
+
+```{r}
+colnames(data2017)
+```
+
+```{r Fig1, echo=TRUE, fig.height=5, fig.width=15}
+library(corrplot)
+x <- cor(data2017[3:12])
+corrplot(x,method = 'number',tl.cex=1,number.cex=0.75,tl.col = "black",col = colorRampPalette(c("yellow","red","navyblue"))(100))
+ggtitle("Correlation Matrix")
+ggsave("Correlation.png")
+```
+
+```{r}
+new <- data2017 %>%
+select(-whisker_high,-whisker_low)
+colnames(new)
+```
+```{r}
+
+```
+```{r}
+names(new)<- c("country" ,"Happiness Rank",
+  "happiness Score",         
+  "Economy"
+,"Family" ,           
+ "Life Expectancy", 
+ "Freedom",           
+ "Generosity",    
+ "Trust Government",
+"Dystopia" ,"Year")
+new
+```
+
+
+
+```{r}
+library(corrplot)
+x <- cor(new[3:10])
+corrplot(x,method = 'number',tl.cex=1,number.cex=0.85,tl.col = "black",col = colorRampPalette(c("yellow","red","navyblue"))(100))
+ggtitle("Correlation Matrix")
+ggsave("Correlation.png")
+```
+
+
+
